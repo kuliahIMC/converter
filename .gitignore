@@ -1,0 +1,21 @@
+# build
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*_autogen/
+*.obj
+*.o
+*.exe
+*.dll
+
+# installer (hasil build, bukan sumber)
+installer/output/
+installer/payload/
+
+# editor
+.vscode/
+.idea/
+*.user
