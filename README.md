@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="asset/Marhaban-studio.ico" width="96" alt="Marhaban Studio">
+  <img src="assets/Marhaban-studio.ico" width="96" alt="Marhaban Studio">
 </p>
 
 <h1 align="center">Marhaban Converter</h1>
