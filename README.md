@@ -6,20 +6,21 @@
 <h1 align="center">Marhaban Converter</h1>
 
 <p align="center">
-  <strong>Modern Desktop Media Converter for Windows</strong>
+  <strong>Modern Desktop Media & Utility Converter for Windows</strong>
 </p>
 
 <p align="center">
-  Convert, compress, and manage your media files through a modern native desktop application.
+  Convert, compress, and manage media files, calculate scientific expressions, and convert Hijri and Gregorian dates through a modern native desktop application.
 </p>
 
 <p align="center">
-  <a href="https://github.com/kuliahIMC/marhaban-converter/releases">
-    <img src="https://img.shields.io/github/v/release/kuliahIMC/marhaban-converter?style=for-the-badge" alt="Latest Release">
+  <a href="https://github.com/kuliahIMC/converter/releases">
+    <img src="https://img.shields.io/github/v/release/kuliahIMC/converter?style=for-the-badge" alt="Latest Release">
   </a>
-  <a href="https://github.com/kuliahIMC/marhaban-converter/releases">
-    <img src="https://img.shields.io/github/downloads/kuliahIMC/marhaban-converter/total?style=for-the-badge" alt="Downloads">
+  <a href="https://github.com/kuliahIMC/converter/releases">
+    <img src="https://img.shields.io/github/downloads/kuliahIMC/converter/total?style=for-the-badge" alt="Downloads">
   </a>
+  <img src="https://img.shields.io/badge/Version-2.1.0-0078D4?style=for-the-badge" alt="Version 2.1.0">
   <img src="https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge" alt="Windows x64">
   <img src="https://img.shields.io/badge/C++-17-00599C?style=for-the-badge" alt="C++17">
   <img src="https://img.shields.io/badge/Qt-6.12-41CD52?style=for-the-badge" alt="Qt 6">
@@ -31,9 +32,9 @@
 
 ## ✨ Overview
 
-**Marhaban Converter** is a native Windows desktop application developed by **Marhaban Studio** for converting and processing images, videos, and audio files.
+**Marhaban Converter** is a native Windows desktop application developed by **Marhaban Studio** for converting and processing media files, performing scientific calculations, and converting Hijri and Gregorian dates.
 
-Built with C++ and Qt 6, the application focuses on delivering a modern desktop experience with a clean interface, modular architecture, and efficient media processing capabilities.
+Built with C++17 and Qt 6, the application focuses on delivering a modern desktop experience with a clean interface, modular architecture, and efficient processing capabilities.
 
 Marhaban Converter combines:
 
@@ -57,6 +58,8 @@ Manage and convert image files through a dedicated workspace.
 - Image processing and compression.
 - Support for multiple image formats.
 - Simple file selection and output workflow.
+- Configurable output folder.
+- Persistent output folder settings.
 
 ### 🎬 Video Conversion
 
@@ -66,6 +69,8 @@ Convert video files using the FFmpeg processing engine.
 - Media stream processing.
 - FFprobe-based media inspection.
 - Background conversion workflow.
+- Configurable output folder.
+- Persistent output folder settings.
 
 ### 🎵 Audio Conversion
 
@@ -94,6 +99,19 @@ A built-in calculator with standard and scientific operations.
 - Exponential and power operations.
 - Degree and radian modes.
 - Mathematical constants.
+
+### 📅 Hijri & Gregorian Calendar Converter
+
+Convert dates between the Hijri and Gregorian calendar systems.
+
+- Hijri-to-Gregorian date conversion.
+- Gregorian-to-Hijri date conversion.
+- Hijri month support.
+- Tabular Hijri calendar calculation.
+- Civil calendar calculation.
+- Display of converted dates in both calendar systems.
+
+**Note:** Calculated Hijri dates may differ from dates determined through local moon sighting or official religious authorities.
 
 ### 🎨 Custom Themes
 
@@ -161,6 +179,8 @@ marhaban-app/
 │   ├── app_context.h
 │   └── main.cpp
 │
+├── tests/
+│
 ├── CMakeLists.txt
 ├── run.ps1
 └── README.md
@@ -169,10 +189,11 @@ marhaban-app/
 ### Architecture Overview
 
 - **UI Layer** — Handles application windows, navigation, and user interaction.
-- **Services Layer** — Contains media conversion, compression, device, and application services.
+- **Services Layer** — Contains media conversion, compression, calendar conversion, settings, and application services.
 - **Workers Layer** — Handles background processing tasks.
 - **Utils Layer** — Provides shared utilities and application path management.
 - **Resources** — Stores icons, images, and visual assets.
+- **Tests** — Contains application tests, including calendar conversion tests.
 
 ---
 
@@ -204,7 +225,7 @@ marhaban-app/
 
 ### Windows Installer
 
-1. Open the [Releases](https://github.com/kuliahIMC/marhaban-converter/releases) page.
+1. Open the [Releases](https://github.com/kuliahIMC/converter/releases) page.
 2. Download the latest Marhaban Converter installer.
 3. Run the installer.
 4. Follow the installation instructions.
@@ -219,8 +240,8 @@ marhaban-app/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/kuliahIMC/marhaban-converter.git
-cd marhaban-converter
+git clone https://github.com/kuliahIMC/converter.git
+cd converter
 ```
 
 ### 2. Configure the Project
