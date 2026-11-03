@@ -6,148 +6,148 @@
 <h1 align="center">Marhaban Converter</h1>
 
 <p align="center">
-  <strong>Modern Desktop Media & Utility Converter for Windows</strong>
+  <strong>Aplikasi Desktop Konversi Media dan Utilitas Modern untuk Windows</strong>
 </p>
 
 <p align="center">
-  Convert, compress, and manage media files, calculate scientific expressions, and convert Hijri and Gregorian dates through a modern native desktop application.
+  Konversi, kompres, dan kelola berkas media, lakukan perhitungan ilmiah, serta konversi tanggal Hijriah dan Masehi melalui aplikasi desktop modern.
 </p>
 
 <p align="center">
   <a href="https://github.com/kuliahIMC/converter/releases">
-    <img src="https://img.shields.io/github/v/release/kuliahIMC/converter?style=for-the-badge" alt="Latest Release">
+    <img src="https://img.shields.io/github/v/release/kuliahIMC/converter?style=for-the-badge" alt="Rilis Terbaru">
   </a>
   <a href="https://github.com/kuliahIMC/converter/releases">
-    <img src="https://img.shields.io/github/downloads/kuliahIMC/converter/total?style=for-the-badge" alt="Downloads">
+    <img src="https://img.shields.io/github/downloads/kuliahIMC/converter/total?style=for-the-badge" alt="Jumlah Unduhan">
   </a>
-  <img src="https://img.shields.io/badge/Version-2.1.0-0078D4?style=for-the-badge" alt="Version 2.1.0">
+  <img src="https://img.shields.io/badge/Versi-2.1.0-0078D4?style=for-the-badge" alt="Versi 2.1.0">
   <img src="https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge" alt="Windows x64">
   <img src="https://img.shields.io/badge/C++-17-00599C?style=for-the-badge" alt="C++17">
   <img src="https://img.shields.io/badge/Qt-6.12-41CD52?style=for-the-badge" alt="Qt 6">
   <img src="https://img.shields.io/badge/FFmpeg-9.0.1-007808?style=for-the-badge" alt="FFmpeg">
-  <img src="https://img.shields.io/badge/License-Proprietary-6F4BFF?style=for-the-badge" alt="Proprietary License">
+  <img src="https://img.shields.io/badge/Lisensi-Proprietary-6F4BFF?style=for-the-badge" alt="Lisensi Proprietary">
 </p>
 
 ---
 
-## ✨ Overview
+## ✨ Tentang Marhaban Converter
 
-**Marhaban Converter** is a native Windows desktop application developed by **Marhaban Studio** for converting and processing media files, performing scientific calculations, and converting Hijri and Gregorian dates.
+**Marhaban Converter** adalah aplikasi desktop native untuk Windows yang dikembangkan oleh **Marhaban Studio**. Aplikasi ini dirancang untuk membantu pengguna mengonversi dan mengolah berkas media, melakukan perhitungan ilmiah, serta mengonversi tanggal Hijriah dan Masehi.
 
-Built with C++17 and Qt 6, the application focuses on delivering a modern desktop experience with a clean interface, modular architecture, and efficient processing capabilities.
+Dibangun menggunakan C++17 dan Qt 6, Marhaban Converter mengutamakan pengalaman penggunaan desktop yang modern, antarmuka yang bersih, arsitektur modular, serta kemampuan pemrosesan yang efisien.
 
-Marhaban Converter combines:
+Teknologi yang digunakan:
 
-- **C++17** for application logic and core functionality.
-- **Qt 6** for the native desktop interface.
-- **FFmpeg** for audio and video processing.
-- **FFprobe** for media inspection and metadata extraction.
-- **CMake** for project configuration and build management.
-- **MinGW** for Windows compilation.
-- **Inno Setup** for Windows installer generation.
+- **C++17** — Bahasa pemrograman untuk logika dan fungsionalitas utama aplikasi.
+- **Qt 6** — Kerangka kerja antarmuka desktop.
+- **FFmpeg** — Mesin pemrosesan audio dan video.
+- **FFprobe** — Pemeriksaan media dan pengambilan metadata.
+- **CMake** — Konfigurasi dan pengelolaan proses pembangunan aplikasi.
+- **MinGW** — Kompilator C++ untuk Windows.
+- **Inno Setup** — Pembuatan installer Windows.
 
 ---
 
-## 🚀 Features
+## 🚀 Fitur Aplikasi
 
-### 🖼️ Image & Photo Tools
+### 🖼️ Pengolah Gambar dan Foto
 
-Manage and convert image files through a dedicated workspace.
+Kelola dan konversi berkas gambar melalui halaman khusus.
 
-- Image format conversion.
-- Image processing and compression.
-- Support for multiple image formats.
-- Simple file selection and output workflow.
-- Configurable output folder.
-- Persistent output folder settings.
+- Konversi format gambar.
+- Pemrosesan dan kompresi gambar.
+- Mendukung berbagai format gambar.
+- Pemilihan berkas dan pengaturan lokasi hasil konversi.
+- Pengaturan folder keluaran yang dapat disesuaikan.
+- Penyimpanan otomatis pengaturan folder keluaran.
 
-### 🎬 Video Conversion
+### 🎬 Konversi Video
 
-Convert video files using the FFmpeg processing engine.
+Konversi berkas video menggunakan mesin pemrosesan FFmpeg.
 
-- Video format conversion.
-- Media stream processing.
-- FFprobe-based media inspection.
-- Background conversion workflow.
-- Configurable output folder.
-- Persistent output folder settings.
+- Konversi format video.
+- Pemrosesan aliran media.
+- Pemeriksaan media menggunakan FFprobe.
+- Proses konversi di latar belakang.
+- Pengaturan folder keluaran yang dapat disesuaikan.
+- Penyimpanan otomatis pengaturan folder keluaran.
 
-### 🎵 Audio Conversion
+### 🎵 Konversi Audio
 
-Process and convert audio files between supported formats.
+Proses dan konversi berkas audio ke berbagai format yang didukung.
 
-- Audio format conversion.
-- Audio stream processing.
-- FFmpeg-powered encoding.
-- Background processing.
+- Konversi format audio.
+- Pemrosesan aliran audio.
+- Pengodean menggunakan FFmpeg.
+- Pemrosesan di latar belakang.
 
-### 📦 Media Compression
+### 📦 Kompresi Media
 
-Reduce media file sizes through dedicated compression tools.
+Mengurangi ukuran berkas media melalui fitur kompresi khusus.
 
-- Image compression.
-- Media compression workflow.
-- Configurable processing options.
+- Kompresi gambar.
+- Alur kerja kompresi media.
+- Pengaturan opsi pemrosesan.
 
-### 🧮 Scientific Calculator
+### 🧮 Kalkulator Ilmiah
 
-A built-in calculator with standard and scientific operations.
+Kalkulator bawaan yang mendukung operasi aritmetika dasar dan perhitungan ilmiah.
 
-- Basic arithmetic.
-- Trigonometric functions.
-- Logarithmic functions.
-- Exponential and power operations.
-- Degree and radian modes.
-- Mathematical constants.
+- Operasi aritmetika dasar.
+- Fungsi trigonometri.
+- Fungsi logaritma.
+- Operasi eksponen dan perpangkatan.
+- Mode derajat dan radian.
+- Konstanta matematika.
 
-### 📅 Hijri & Gregorian Calendar Converter
+### 📅 Konverter Kalender Hijriah dan Masehi
 
-Convert dates between the Hijri and Gregorian calendar systems.
+Mengonversi tanggal antara sistem kalender Hijriah dan kalender Masehi.
 
-- Hijri-to-Gregorian date conversion.
-- Gregorian-to-Hijri date conversion.
-- Hijri month support.
-- Tabular Hijri calendar calculation.
-- Civil calendar calculation.
-- Display of converted dates in both calendar systems.
+- Konversi tanggal Hijriah ke Masehi.
+- Konversi tanggal Masehi ke Hijriah.
+- Dukungan nama-nama bulan Hijriah.
+- Perhitungan kalender Hijriah tabular.
+- Perhitungan kalender sipil.
+- Menampilkan hasil konversi dalam kedua sistem kalender.
 
-**Note:** Calculated Hijri dates may differ from dates determined through local moon sighting or official religious authorities.
+**Catatan:** Hasil perhitungan tanggal Hijriah dapat berbeda dengan tanggal yang ditetapkan berdasarkan rukyatul hilal atau keputusan otoritas keagamaan setempat.
 
-### 🎨 Custom Themes
+### 🎨 Tema Tampilan
 
-Personalize the application interface with multiple visual themes.
+Sesuaikan tampilan aplikasi menggunakan berbagai pilihan tema.
 
-| Theme | Description |
+| Tema | Deskripsi |
 | :--- | :--- |
-| Light | Clean light appearance |
-| Dark | Dark interface |
-| Bochi | Character-inspired theme |
-| Frieren | Character-inspired theme |
-| Kurumi | Character-inspired theme |
-| Mao Mao | Character-inspired theme |
-| Ram & Rem | Character-inspired theme |
+| Light | Tampilan terang dan bersih |
+| Dark | Tampilan gelap |
+| Bochi | Tema terinspirasi karakter |
+| Frieren | Tema terinspirasi karakter |
+| Kurumi | Tema terinspirasi karakter |
+| Mao Mao | Tema terinspirasi karakter |
+| Ram & Rem | Tema terinspirasi karakter |
 
 ---
 
-## 🧰 Technology Stack
+## 🧰 Teknologi yang Digunakan
 
-| Technology | Purpose |
+| Teknologi | Kegunaan |
 | :--- | :--- |
-| C++17 | Core application development |
-| Qt 6.12 | Desktop GUI framework |
-| Qt Widgets | User interface components |
-| CMake | Build system |
-| MinGW | C++ compiler |
-| FFmpeg 9.0.1 | Audio and video processing |
-| FFprobe | Media information and inspection |
-| PowerShell | Development automation |
-| Inno Setup 7 | Windows installer |
+| C++17 | Pengembangan inti aplikasi |
+| Qt 6.12 | Kerangka kerja aplikasi desktop |
+| Qt Widgets | Komponen antarmuka pengguna |
+| CMake | Sistem pembangunan aplikasi |
+| MinGW | Kompilator C++ |
+| FFmpeg 9.0.1 | Pemrosesan audio dan video |
+| FFprobe | Informasi dan pemeriksaan media |
+| PowerShell | Otomatisasi pengembangan |
+| Inno Setup 7 | Pembuatan installer Windows |
 
 ---
 
-## 🏗️ Project Architecture
+## 🏗️ Arsitektur Proyek
 
-Marhaban Converter uses a modular project structure to separate user interface components, application services, utilities, and background processing.
+Marhaban Converter menggunakan struktur proyek modular untuk memisahkan komponen antarmuka pengguna, layanan aplikasi, utilitas, dan pemrosesan di latar belakang.
 
 ```text
 marhaban-app/
@@ -186,85 +186,85 @@ marhaban-app/
 └── README.md
 ```
 
-### Architecture Overview
+### Penjelasan Arsitektur
 
-- **UI Layer** — Handles application windows, navigation, and user interaction.
-- **Services Layer** — Contains media conversion, compression, calendar conversion, settings, and application services.
-- **Workers Layer** — Handles background processing tasks.
-- **Utils Layer** — Provides shared utilities and application path management.
-- **Resources** — Stores icons, images, and visual assets.
-- **Tests** — Contains application tests, including calendar conversion tests.
+- **UI Layer** — Mengelola jendela aplikasi, navigasi, dan interaksi pengguna.
+- **Services Layer** — Menangani konversi media, kompresi, konversi kalender, pengaturan, dan layanan aplikasi.
+- **Workers Layer** — Menangani tugas pemrosesan di latar belakang.
+- **Utils Layer** — Menyediakan fungsi pendukung bersama dan pengelolaan lokasi aplikasi.
+- **Resources** — Menyimpan ikon, gambar, dan aset visual.
+- **Tests** — Menyimpan pengujian aplikasi, termasuk pengujian konversi kalender.
 
 ---
 
-## 💻 System Requirements
+## 💻 Persyaratan Sistem
 
-### Runtime
+### Persyaratan Penggunaan
 
-| Requirement | Specification |
+| Persyaratan | Spesifikasi |
 | :--- | :--- |
-| Operating System | Windows 10 / Windows 11 |
-| Architecture | 64-bit (x64) |
-| RAM | 4 GB minimum recommended |
-| Storage | Depends on application and media files |
-| Dependencies | Bundled Qt, MinGW runtime, FFmpeg |
+| Sistem Operasi | Windows 10 / Windows 11 |
+| Arsitektur | 64-bit (x64) |
+| RAM | Minimum yang disarankan 4 GB |
+| Penyimpanan | Menyesuaikan aplikasi dan berkas media |
+| Dependensi | Qt, MinGW Runtime, dan FFmpeg yang disertakan |
 
-### Development Environment
+### Lingkungan Pengembangan
 
-- Windows 10 or Windows 11.
-- C++17 compatible compiler.
+- Windows 10 atau Windows 11.
+- Kompilator yang mendukung C++17.
 - Qt 6.12.
 - CMake.
-- MinGW toolchain compatible with Qt.
-- FFmpeg and FFprobe.
+- MinGW yang kompatibel dengan Qt.
+- FFmpeg dan FFprobe.
 - Inno Setup 7.
 
 ---
 
-## 📥 Installation
+## 📥 Instalasi
 
-### Windows Installer
+### Menggunakan Installer Windows
 
-1. Open the [Releases](https://github.com/kuliahIMC/converter/releases) page.
-2. Download the latest Marhaban Converter installer.
-3. Run the installer.
-4. Follow the installation instructions.
-5. Launch Marhaban Converter from the Start Menu or Desktop shortcut.
+1. Buka halaman [Rilis Marhaban Converter](https://github.com/kuliahIMC/converter/releases).
+2. Unduh installer Marhaban Converter versi terbaru.
+3. Jalankan berkas installer.
+4. Ikuti petunjuk instalasi yang ditampilkan.
+5. Jalankan Marhaban Converter melalui Start Menu atau pintasan Desktop.
 
-> The Windows installer includes the application runtime dependencies and bundled FFmpeg components.
+> Installer Windows sudah menyertakan dependensi runtime aplikasi dan komponen FFmpeg yang diperlukan.
 
 ---
 
-## 🛠️ Build from Source
+## 🛠️ Membangun dari Source Code
 
-### 1. Clone the Repository
+### 1. Mengunduh Repository
 
 ```bash
 git clone https://github.com/kuliahIMC/converter.git
 cd converter
 ```
 
-### 2. Configure the Project
+### 2. Mengonfigurasi Proyek
 
 ```powershell
 cmake -S . -B build -G "MinGW Makefiles"
 ```
 
-Make sure CMake can locate your Qt installation and compatible MinGW compiler.
+Pastikan CMake dapat menemukan lokasi instalasi Qt dan kompilator MinGW yang kompatibel.
 
-### 3. Build the Application
+### 3. Membangun Aplikasi
 
 ```powershell
 cmake --build build --config Release
 ```
 
-### 4. Run the Application
+### 4. Menjalankan Aplikasi
 
 ```powershell
 .\build\MarhabanConverter.exe
 ```
 
-Alternatively, use the provided PowerShell script:
+Sebagai alternatif, gunakan skrip PowerShell yang telah disediakan:
 
 ```powershell
 .\run.ps1
@@ -272,27 +272,27 @@ Alternatively, use the provided PowerShell script:
 
 ---
 
-## 📦 Building the Windows Installer
+## 📦 Membuat Installer Windows
 
-Marhaban Converter uses **Inno Setup 7** to package the application into a Windows installer.
+Marhaban Converter menggunakan **Inno Setup 7** untuk mengemas aplikasi menjadi installer Windows.
 
-The packaging process includes:
+Proses pengemasan mencakup:
 
-- Application executable.
-- Qt runtime libraries.
-- MinGW runtime libraries.
-- Qt platform and image plugins.
-- Application resources.
-- FFmpeg and FFprobe binaries.
-- Required FFmpeg shared libraries.
+- Berkas executable aplikasi.
+- Pustaka runtime Qt.
+- Pustaka runtime MinGW.
+- Plugin platform dan gambar Qt.
+- Sumber daya aplikasi.
+- Berkas executable FFmpeg dan FFprobe.
+- Pustaka bersama FFmpeg yang diperlukan.
 
-Compile the installer using:
+Kompilasi installer menggunakan perintah berikut:
 
 ```powershell
 & "C:\Program Files\Inno Setup 7\ISCC.exe" ".\installer\MarhabanConverter.iss"
 ```
 
-The generated installer will be available in:
+Installer yang dihasilkan akan tersimpan di:
 
 ```text
 installer/output/
@@ -300,39 +300,39 @@ installer/output/
 
 ---
 
-## ⚖️ License & Third-Party Notices
+## ⚖️ Lisensi dan Pemberitahuan Pihak Ketiga
 
-Marhaban Converter is proprietary software developed by **Marhaban Studio**.
+Marhaban Converter merupakan perangkat lunak berpemilik (*proprietary software*) yang dikembangkan oleh **Marhaban Studio**.
 
-This project uses third-party technologies and libraries, including:
+Proyek ini menggunakan beberapa teknologi dan pustaka pihak ketiga, termasuk:
 
-- **Qt** — Qt licensing terms apply to the distributed components.
-- **FFmpeg** — The bundled FFmpeg build enables GPL and additional third-party libraries. Distribution must comply with applicable licensing requirements.
-- **MinGW** — Runtime libraries are subject to their respective licenses.
+- **Qt** — Komponen yang didistribusikan tunduk pada ketentuan lisensi Qt yang berlaku.
+- **FFmpeg** — Paket FFmpeg yang disertakan menggunakan konfigurasi GPL dan pustaka pihak ketiga tambahan. Distribusinya harus mematuhi ketentuan lisensi yang berlaku.
+- **MinGW** — Pustaka runtime tunduk pada lisensi masing-masing.
 
-Third-party license notices and required source-code availability must be provided in accordance with the applicable licenses.
+Pemberitahuan lisensi pihak ketiga dan penyediaan kode sumber yang diwajibkan harus dipenuhi sesuai ketentuan lisensi terkait.
 
-The Marhaban Converter application itself is not licensed under the same terms as its third-party dependencies.
+Aplikasi Marhaban Converter sendiri tidak menggunakan lisensi yang sama dengan seluruh dependensi pihak ketiganya.
 
 ---
 
-## 🏢 Developer
+## 🏢 Pengembang
 
 <p align="center">
   <strong>MARHABAN STUDIO</strong>
 </p>
 
 <p align="center">
-  Desktop Application Development
+  Pengembangan Aplikasi Desktop
 </p>
 
 <p align="center">
-  Building practical software with modern technologies.
+  Membangun perangkat lunak yang bermanfaat dengan teknologi modern.
 </p>
 
 ---
 
 <p align="center">
   <strong>Marhaban Converter</strong><br>
-  <sub>Built with C++ · Qt 6 · FFmpeg</sub>
+  <sub>Dibangun dengan C++ · Qt 6 · FFmpeg</sub>
 </p>
