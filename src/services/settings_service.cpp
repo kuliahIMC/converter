@@ -9,7 +9,9 @@
 QJsonObject SettingsService::defaultSettings()
 {
     QJsonObject outputObj;
-    outputObj["folder"] = "";
+    outputObj["folder"] = ""; // kompatibilitas pengaturan lama
+    outputObj["image_folder"] = "";
+    outputObj["video_folder"] = "";
     outputObj["remember_last_folder"] = true;
 
     QJsonObject conversionObj;
@@ -152,6 +154,41 @@ void SettingsService::setOutputFolder(const QString &folder)
     QJsonObject section = getSection("output");
     section["folder"] = folder;
     setSection("output", section);
+}
+
+QString SettingsService::getImageOutputFolder() const
+{
+    const QJsonObject output = getSection("output");
+    const QString folder = output.value("image_folder").toString();
+
+    // Gunakan folder lama jika pengaturan baru belum pernah diisi.
+    return folder.isEmpty()
+        ? output.value("folder").toString()
+        : folder;
+}
+
+void SettingsService::setImageOutputFolder(const QString &folder)
+{
+    QJsonObject output = getSection("output");
+    output["image_folder"] = folder;
+    setSection("output", output);
+}
+
+QString SettingsService::getVideoOutputFolder() const
+{
+    const QJsonObject output = getSection("output");
+    const QString folder = output.value("video_folder").toString();
+
+    return folder.isEmpty()
+        ? output.value("folder").toString()
+        : folder;
+}
+
+void SettingsService::setVideoOutputFolder(const QString &folder)
+{
+    QJsonObject output = getSection("output");
+    output["video_folder"] = folder;
+    setSection("output", output);
 }
 
 bool SettingsService::getRememberLastFolder() const

@@ -7,6 +7,7 @@ class QLabel;
 class QPushButton;
 class QComboBox;
 class QProgressBar;
+class QLineEdit;
 class DropListWidget;
 class ImageConverterService;
 
@@ -33,6 +34,9 @@ private:
     void updateStatus();
     void processNextFile();
     void finishBatchConversion();
+    void browseOutputFolder();
+    void saveOutputFolder();
+
     QString createOutputPath(const QString &inputPath) const;
 
     QStringList files_;
@@ -42,14 +46,21 @@ private:
 
     DropListWidget *fileList_ = nullptr;
     QComboBox *formatCombo_ = nullptr;
+    QLineEdit *outputPathEdit_ = nullptr;
+
     QLabel *statusLabel_ = nullptr;
+
     QPushButton *convertButton_ = nullptr;
     QPushButton *cancelButton_ = nullptr;
+    QPushButton *browseOutputButton_ = nullptr;
+
     QProgressBar *progressBar_ = nullptr;
 
     ImageConverterService *converter_ = nullptr;
 
     int completedFiles_ = 0;
     int totalFiles_ = 0;
+
     bool batchCancelled_ = false;
+    bool batchFinished_ = false;
 };

@@ -9,6 +9,7 @@ class QComboBox;
 class QProgressBar;
 class DropListWidget;
 class VideoConverterService;
+class QLineEdit;
 
 class VideoPage : public QWidget
 {
@@ -34,6 +35,8 @@ private slots:
     void handleConversionFailed(const QString &error);
     void handleConversionCancelled();
     void cancelConversion();
+    void browseOutputFolder();
+    void saveOutputFolder();
 
 private:
     void setupUI();
@@ -57,6 +60,9 @@ private:
     QPushButton *convertButton_ = nullptr;
     QPushButton *cancelButton_ = nullptr;
     QProgressBar *progressBar_ = nullptr;
+    QLineEdit *outputPathEdit_ = nullptr;
+    QPushButton *browseOutputButton_ = nullptr;
+
 
     VideoConverterService *converter_ = nullptr;
 };

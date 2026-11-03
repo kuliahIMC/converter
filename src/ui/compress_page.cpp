@@ -19,6 +19,16 @@
 #include <QSlider>
 #include <QVBoxLayout>
 
+#include <QIcon>
+#include <QImageReader>
+#include <QPixmap>
+#include <QSize>
+#include <QStyle>
+
+// Ukuran thumbnail persegi (1:1) dan tinggi baris di daftar
+static constexpr int kThumbSize = 96;
+static constexpr int kRowHeight = 116;
+
 CompressPage::CompressPage(QWidget *parent)
     : QWidget(parent),
       imageService_(new ImageCompressionService(this)),
@@ -145,6 +155,118 @@ QString CompressPage::category() const
 
 void CompressPage::setupUI()
 {
+    // ===== STYLE HALAMAN (gaya Notion) =====
+    // Dipasang di halaman ini saja supaya QSS tema tidak terganggu.
+    setStyleSheet(R"QSS(
+        /* Tombol utama: ungu */
+        QPushButton#primaryButton {
+            background: #5645d4;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 18px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        QPushButton#primaryButton:hover   { background: #4534b3; }
+        QPushButton#primaryButton:pressed { background: #3a2a99; }
+        QPushButton#primaryButton:disabled {
+            background: rgba(255, 255, 255, 0.55);
+            color: #a4a097;
+            border: 1px solid #e5e3df;
+        }
+
+        /* Tombol sekunder: Hapus, Bersihkan, Pilih Folder */
+        QPushButton#secondaryButton {
+            background: rgba(255, 255, 255, 0.88);
+            color: #1a1a1a;
+            border: 1px solid #c8c4be;
+            border-radius: 8px;
+            padding: 9px 16px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        QPushButton#secondaryButton:hover {
+            background: #ffffff;
+            border-color: #787671;
+        }
+        QPushButton#secondaryButton:pressed {
+            background: #f0eeec;
+        }
+        QPushButton#secondaryButton:disabled {
+            background: rgba(255, 255, 255, 0.45);
+            color: #a4a097;
+            border-color: #e5e3df;
+        }
+
+        /* Pilihan kategori */
+        QComboBox {
+            background: rgba(255, 255, 255, 0.90);
+            color: #1a1a1a;
+            border: 1px solid #c8c4be;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+        }
+        QComboBox:hover { border-color: #5645d4; }
+        QComboBox QAbstractItemView {
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid #e5e3df;
+            selection-background-color: #e6e0f5;
+            selection-color: #391c57;
+            outline: none;
+        }
+
+        /* Slider kualitas */
+        QSlider::groove:horizontal {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.60);
+            border-radius: 3px;
+        }
+        QSlider::sub-page:horizontal {
+            background: #5645d4;
+            border-radius: 3px;
+        }
+        QSlider::handle:horizontal {
+            background: #ffffff;
+            border: 2px solid #5645d4;
+            width: 16px;
+            height: 16px;
+            margin: -7px 0;
+            border-radius: 10px;
+        }
+        QSlider::handle:horizontal:hover {
+            background: #e6e0f5;
+        }
+        QSlider::sub-page:horizontal:disabled {
+            background: #bbb8b1;
+        }
+        QSlider::handle:horizontal:disabled {
+            border-color: #bbb8b1;
+        }
+
+        /* Progress bar tipis berwarna ungu */
+        QProgressBar {
+            background: rgba(255, 255, 255, 0.60);
+            color: #37352f;
+            border: none;
+            border-radius: 9px;
+            min-height: 18px;
+            max-height: 18px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        QProgressBar::chunk {
+            background: #5645d4;
+            border-radius: 9px;
+        }
+    )QSS");
+
     auto *layout = new QVBoxLayout(this);
 
     layout->setContentsMargins(0, 0, 0, 0);
@@ -153,7 +275,7 @@ void CompressPage::setupUI()
     auto *title = new QLabel("Media Compressor");
 
     title->setStyleSheet(
-        "font-size:24px;font-weight:700;"
+        "font-size:26px;font-weight:700;"
     );
 
     auto *description = new QLabel(
@@ -169,10 +291,12 @@ void CompressPage::setupUI()
     layout->addSpacing(12);
 
     auto *toolbar = new QHBoxLayout;
+    toolbar->setSpacing(8);
 
     auto *addButton = new QPushButton("+ Tambahkan Media");
     addButton->setObjectName("primaryButton");
     addButton->setCursor(Qt::PointingHandCursor);
+    addButton->setMinimumHeight(38);
 
     connect(
         addButton,
@@ -182,7 +306,9 @@ void CompressPage::setupUI()
     );
 
     auto *removeButton = new QPushButton("Hapus");
+    removeButton->setObjectName("secondaryButton");
     removeButton->setCursor(Qt::PointingHandCursor);
+    removeButton->setMinimumHeight(38);
 
     connect(
         removeButton,
@@ -192,7 +318,9 @@ void CompressPage::setupUI()
     );
 
     auto *clearButton = new QPushButton("Bersihkan");
+    clearButton->setObjectName("secondaryButton");
     clearButton->setCursor(Qt::PointingHandCursor);
+    clearButton->setMinimumHeight(38);
 
     connect(
         clearButton,
@@ -208,6 +336,7 @@ void CompressPage::setupUI()
 
     categoryCombo_ = new QComboBox;
     categoryCombo_->setCursor(Qt::PointingHandCursor);
+    categoryCombo_->setMinimumHeight(38);
 
     categoryCombo_->addItems({
         "Otomatis",
@@ -233,24 +362,67 @@ void CompressPage::setupUI()
         QAbstractItemView::ExtendedSelection
     );
 
-    fileList_->setMinimumHeight(220);
+    fileList_->setMinimumHeight(260);
+    fileList_->setIconSize(QSize(kThumbSize, kThumbSize));
+    fileList_->setSpacing(4);
+    fileList_->setVerticalScrollMode(
+        QAbstractItemView::ScrollPerPixel
+    );
 
-    fileList_->setStyleSheet(R"(
+    // Awal kosong = transparan (hanya bingkai putus-putus ala drop zone).
+    // Saat file masuk, tiap file tampil sebagai kartu.
+    fileList_->viewport()->setAutoFillBackground(false);
+    fileList_->setStyleSheet(R"QSS(
             QListWidget {
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                border-radius: 8px;
-                padding: 6px;
+                background: transparent;
+                border: 2px dashed rgba(120, 118, 113, 0.55);
+                border-radius: 16px;
+                padding: 8px;
                 outline: none;
+                font-family: "Inter", "Segoe UI", sans-serif;
+                font-size: 14px;
+                font-weight: 500;
             }
             QListWidget::item {
-                padding: 8px 10px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                background: rgba(255, 255, 255, 0.90);
+                color: #1a1a1a;
+                border: 1px solid #e5e3df;
+                border-radius: 12px;
+                padding: 8px 12px;
+                margin: 2px 2px;
+            }
+            QListWidget::item:hover {
+                background: #ffffff;
+                border: 1px solid #c8c4be;
             }
             QListWidget::item:selected {
-                background: rgba(255, 255, 255, 0.15);
-                color: #ffffff;
+                background: #e6e0f5;
+                color: #391c57;
+                border: 2px solid #5645d4;
             }
-        )");
+
+            QScrollBar:vertical {
+                background: transparent;
+                width: 10px;
+                margin: 4px 2px;
+            }
+            QScrollBar::handle:vertical {
+                background: rgba(120, 118, 113, 0.55);
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: rgba(86, 69, 212, 0.85);
+            }
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {
+                background: transparent;
+            }
+        )QSS");
 
     connect(
         fileList_,
@@ -264,10 +436,11 @@ void CompressPage::setupUI()
     auto *qualityTitle = new QLabel("Kualitas kompresi");
 
     qualityTitle->setStyleSheet(
-        "font-size:13px;font-weight:600;color:#404040;"
+        "font-size:13px;font-weight:600;"
     );
 
     auto *qualityLayout = new QHBoxLayout;
+    qualityLayout->setSpacing(12);
 
     qualitySlider_ = new QSlider(Qt::Horizontal);
     qualitySlider_->setRange(10, 100);
@@ -276,6 +449,9 @@ void CompressPage::setupUI()
 
     qualityLabel_ = new QLabel("80%");
     qualityLabel_->setMinimumWidth(45);
+    qualityLabel_->setStyleSheet(
+        "font-size:13px;font-weight:600;"
+    );
 
     connect(
         qualitySlider_,
@@ -297,7 +473,9 @@ void CompressPage::setupUI()
     outputFolderButton_ = new QPushButton(
         "Pilih Folder Hasil"
     );
+    outputFolderButton_->setObjectName("secondaryButton");
     outputFolderButton_->setCursor(Qt::PointingHandCursor);
+    outputFolderButton_->setMinimumHeight(38);
 
     layout->addWidget(outputFolderButton_);
 
@@ -310,6 +488,7 @@ void CompressPage::setupUI()
     layout->addWidget(progressBar_);
 
     auto *bottom = new QHBoxLayout;
+    bottom->setSpacing(8);
 
     statusLabel_ = new QLabel(
         "Belum ada media dipilih."
@@ -322,6 +501,8 @@ void CompressPage::setupUI()
     compressButton_ = new QPushButton("Kompres");
     compressButton_->setObjectName("primaryButton");
     compressButton_->setCursor(Qt::PointingHandCursor);
+    compressButton_->setMinimumHeight(38);
+    compressButton_->setMinimumWidth(105);
     compressButton_->setEnabled(false);
 
     cancelButton_ = new QPushButton("Batalkan");
@@ -337,7 +518,7 @@ void CompressPage::setupUI()
             background-color: #ffffff;
             color: #dc2626;
             border: 1px solid #fecaca;
-            border-radius: 7px;
+            border-radius: 8px;
             padding: 8px 16px;
             font-size: 13px;
             font-weight: 600;
@@ -422,6 +603,45 @@ void CompressPage::addFiles(const QStringList &filePaths)
 
         item->setData(Qt::UserRole, absolutePath);
         item->setToolTip(absolutePath);
+
+        // Tampilan saja: gambar = thumbnail persegi (crop tengah),
+        // video = ikon play persegi
+        bool iconSet = false;
+
+        if (image) {
+            QImageReader reader(absolutePath);
+            reader.setAutoTransform(true);
+
+            const QPixmap thumbnail =
+                QPixmap::fromImage(reader.read());
+
+            if (!thumbnail.isNull()) {
+                const QPixmap scaled = thumbnail.scaled(
+                    kThumbSize,
+                    kThumbSize,
+                    Qt::KeepAspectRatioByExpanding,
+                    Qt::SmoothTransformation
+                );
+
+                const int x = (scaled.width() - kThumbSize) / 2;
+                const int y = (scaled.height() - kThumbSize) / 2;
+
+                item->setIcon(QIcon(
+                    scaled.copy(x, y, kThumbSize, kThumbSize)
+                ));
+
+                iconSet = true;
+            }
+        }
+
+        if (!iconSet) {
+            item->setIcon(style()->standardIcon(
+                video ? QStyle::SP_MediaPlay
+                      : QStyle::SP_FileIcon
+            ));
+        }
+
+        item->setSizeHint(QSize(0, kRowHeight));
     }
 
     updateStatus();

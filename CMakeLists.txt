@@ -12,7 +12,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_PREFIX_PATH "C:/Qt/6.12.0/mingw_64")
 
-find_package(Qt6 6.12 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 6.12 REQUIRED COMPONENTS Widgets Svg)
 
 qt_standard_project_setup()
 
@@ -37,6 +37,8 @@ qt_add_executable(MarhabanConverter
     src/ui/compress_page.cpp
     src/ui/calculator_page.h
     src/ui/calculator_page.cpp
+    src/ui/calendar_page.h
+    src/ui/calendar_page.cpp
 
     src/services/aae_service.h
     src/services/aae_service.cpp
@@ -58,6 +60,13 @@ qt_add_executable(MarhabanConverter
     src/services/video_compression_service.cpp
     src/services/video_converter_service.h
     src/services/video_converter_service.cpp
+    src/services/tabular_hijri_calendar.h
+    src/services/tabular_hijri_calendar.cpp
+    src/services/civil_calendar.h
+    src/services/civil_calendar.cpp
+    src/services/calendar_converter_service.h
+    src/services/calendar_converter_service.cpp
+
 
     src/themes/theme_manager.h
     src/themes/theme_manager.cpp
@@ -70,9 +79,34 @@ qt_add_executable(MarhabanConverter
 )
 
 target_link_libraries(MarhabanConverter
-    PRIVATE Qt6::Widgets
+    PRIVATE
+        Qt6::Widgets
+        Qt6::Svg
 )
 
 set_target_properties(MarhabanConverter PROPERTIES
     WIN32_EXECUTABLE TRUE
+)
+
+add_executable(CalendarTests
+    tests/calendar_test.cpp
+
+    src/services/tabular_hijri_calendar.h
+    src/services/tabular_hijri_calendar.cpp
+
+    src/services/civil_calendar.h
+    src/services/civil_calendar.cpp
+
+    src/services/calendar_converter_service.h
+    src/services/calendar_converter_service.cpp
+)
+
+target_include_directories(CalendarTests
+    PRIVATE
+        src/services
+)
+
+target_link_libraries(CalendarTests
+    PRIVATE
+        Qt6::Core
 )

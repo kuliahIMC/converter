@@ -282,7 +282,7 @@ private:
     }
 };
 
-// Jenis tombol, dipakai ThemeManager lewat selector [calcKey="..."]
+// Jenis tombol, dipakai stylesheet lewat selector [calcKey="..."]
 QString keyKind(const QString &t)
 {
     static const QStringList digits = {
@@ -327,6 +327,170 @@ CalculatorPage::CalculatorPage(QWidget *parent)
 
 void CalculatorPage::setupUI()
 {
+    // ===== STYLE HALAMAN (gaya Notion) =====
+    // Dipasang di halaman ini saja, memakai objectName dan properti
+    // calcKey yang sudah ada. Kartu punya latar sendiri sehingga tetap
+    // terbaca di semua tema, termasuk tema berfoto.
+    setStyleSheet(R"QSS(
+        /* Area scroll transparan */
+        QScrollArea {
+            background: transparent;
+            border: none;
+        }
+        QScrollArea > QWidget > QWidget {
+            background: transparent;
+        }
+        QScrollBar:vertical {
+            background: transparent;
+            width: 10px;
+            margin: 4px 2px;
+        }
+        QScrollBar::handle:vertical {
+            background: rgba(120, 118, 113, 0.55);
+            border-radius: 4px;
+            min-height: 30px;
+        }
+        QScrollBar::handle:vertical:hover {
+            background: rgba(86, 69, 212, 0.85);
+        }
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {
+            height: 0px;
+        }
+        QScrollBar::add-page:vertical,
+        QScrollBar::sub-page:vertical {
+            background: transparent;
+        }
+
+        /* Kartu kalkulator */
+        QFrame#calcCard {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #e5e3df;
+            border-radius: 20px;
+        }
+        QFrame#calcCard QLabel {
+            background: transparent;
+            font-family: "Inter", "Segoe UI", sans-serif;
+        }
+
+        /* Chip mode sudut (DEG / RAD) */
+        QLabel#calcModeChip {
+            background: #e6e0f5;
+            color: #391c57;
+            border-radius: 10px;
+            padding: 3px 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Riwayat / pesan error */
+        QLabel#calcHistory {
+            color: #787671;
+            font-size: 13px;
+        }
+
+        /* Layar navy */
+        QLineEdit#calcDisplay {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                        stop:0 #0a1530, stop:1 #1a2a52);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            padding: 6px 18px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 30px;
+            font-weight: 600;
+            selection-background-color: #5645d4;
+            selection-color: #ffffff;
+            placeholder-text-color: #a4a097;
+        }
+
+        /* Tombol chip (Ilmiah, DEG / RAD) */
+        QPushButton[calcKey="chip"] {
+            background: #ffffff;
+            color: #37352f;
+            border: 1px solid #c8c4be;
+            border-radius: 14px;
+            padding: 5px 14px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        QPushButton[calcKey="chip"]:hover {
+            border-color: #787671;
+        }
+        QPushButton[calcKey="chip"]:checked {
+            background: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+
+        /* Tombol angka */
+        QPushButton[calcKey="digit"] {
+            background: #f6f5f4;
+            color: #1a1a1a;
+            border: 1px solid #e5e3df;
+            border-radius: 12px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        QPushButton[calcKey="digit"]:hover   { background: #ffffff; border-color: #c8c4be; }
+        QPushButton[calcKey="digit"]:pressed { background: #ede9e4; }
+
+        /* Tombol operator (lavender) */
+        QPushButton[calcKey="operator"] {
+            background: #e6e0f5;
+            color: #391c57;
+            border: none;
+            border-radius: 12px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        QPushButton[calcKey="operator"]:hover   { background: #d6b6f6; }
+        QPushButton[calcKey="operator"]:pressed { background: #c4a0ee; }
+
+        /* Tombol sama dengan (ungu utama) */
+        QPushButton[calcKey="equals"] {
+            background: #5645d4;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 22px;
+            font-weight: 600;
+        }
+        QPushButton[calcKey="equals"]:hover   { background: #4534b3; }
+        QPushButton[calcKey="equals"]:pressed { background: #3a2a99; }
+
+        /* Tombol aksi: C, DEL, ±, % (peach) */
+        QPushButton[calcKey="action"] {
+            background: #ffe8d4;
+            color: #793400;
+            border: none;
+            border-radius: 12px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        QPushButton[calcKey="action"]:hover   { background: #ffdcbf; }
+        QPushButton[calcKey="action"]:pressed { background: #ffcfa8; }
+
+        /* Tombol fungsi ilmiah (sky) */
+        QPushButton[calcKey="func"] {
+            background: #dcecfa;
+            color: #1a2a52;
+            border: none;
+            border-radius: 10px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        QPushButton[calcKey="func"]:hover   { background: #c9e0f5; }
+        QPushButton[calcKey="func"]:pressed { background: #b5d3ef; }
+    )QSS");
+
     // Bungkus dengan scroll area: kalau jendela kurang tinggi,
     // kalkulator bisa di-scroll dan tombolnya tidak saling menumpuk
     auto *outer = new QVBoxLayout(this);
@@ -355,8 +519,8 @@ void CalculatorPage::setupUI()
     card->setMaximumWidth(600);
 
     auto *cardLayout = new QVBoxLayout(card);
-    cardLayout->setContentsMargins(20, 14, 20, 18);
-    cardLayout->setSpacing(8);
+    cardLayout->setContentsMargins(20, 16, 20, 20);
+    cardLayout->setSpacing(10);
 
     // Baris atas: mode sudut + tombol chip
     auto *modeLayout = new QHBoxLayout;
@@ -398,7 +562,7 @@ void CalculatorPage::setupUI()
     display_ = new QLineEdit;
     display_->setObjectName("calcDisplay");
     display_->setPlaceholderText("0");
-    display_->setMinimumHeight(52);
+    display_->setMinimumHeight(64);
     display_->setAlignment(Qt::AlignRight);
     display_->setClearButtonEnabled(false);
 

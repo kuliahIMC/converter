@@ -2,8 +2,9 @@
 
 #include <QObject>
 #include <QString>
-#include <QImage>
-#include <QImageWriter>
+#include <QProcess>
+
+class QTemporaryDir;
 
 class ImageConverterService : public QObject
 {
@@ -11,6 +12,7 @@ class ImageConverterService : public QObject
 
 public:
     explicit ImageConverterService(QObject *parent = nullptr);
+    ~ImageConverterService() override;
 
     bool isRunning() const;
 
@@ -29,7 +31,35 @@ signals:
     void failed(const QString &errorMessage);
     void cancelled();
 
+private slots:
+    void handleFinished(
+        int exitCode,
+        QProcess::ExitStatus exitStatus
+    );
+
+    void handleProcessError(QProcess::ProcessError error);
+
 private:
+    bool prepareQtInput(const QString &inputPath);
+
+    bool convertWithQt(
+        const QString &inputPath,
+        const QString &outputPath
+    );
+
+    bool convertToSvg(
+        const QString &inputPath,
+        const QString &outputPath
+    );
+
+    void cleanup();
+
+    QProcess *process_ = nullptr;
+    QTemporaryDir *temporaryDir_ = nullptr;
+
+    QString outputPath_;
+    QString inputPath_;
+
     bool running_ = false;
     bool cancelled_ = false;
 };

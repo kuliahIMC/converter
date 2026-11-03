@@ -4,6 +4,7 @@
 #include "../services/format_registry.h"
 #include "../services/audio_converter_service.h"
 
+#include <QAbstractItemView>
 #include <QComboBox>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -15,6 +16,14 @@
 #include <QProgressBar>
 #include <QMessageBox>
 #include <QDir>
+
+#include <QIcon>
+#include <QSize>
+#include <QStyle>
+
+// Ukuran ikon audio (persegi 1:1) dan tinggi baris di daftar
+static constexpr int kIconSize = 72;
+static constexpr int kRowHeight = 96;
 
 AudioPage::AudioPage(QWidget *parent)
     : QWidget(parent)
@@ -66,12 +75,108 @@ QString AudioPage::selectedOutputFormat() const
 
 void AudioPage::setupUI()
 {
+    // ===== STYLE HALAMAN (gaya Notion) =====
+    // Dipasang di halaman ini saja supaya QSS tema tidak terganggu.
+    setStyleSheet(R"QSS(
+        /* Tombol utama: ungu */
+        QPushButton#primaryButton {
+            background: #5645d4;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 18px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        QPushButton#primaryButton:hover   { background: #4534b3; }
+        QPushButton#primaryButton:pressed { background: #3a2a99; }
+        QPushButton#primaryButton:disabled {
+            background: rgba(255, 255, 255, 0.55);
+            color: #a4a097;
+            border: 1px solid #e5e3df;
+        }
+
+        /* Tombol sekunder: Hapus, Bersihkan */
+        QPushButton#secondaryButton {
+            background: rgba(255, 255, 255, 0.88);
+            color: #1a1a1a;
+            border: 1px solid #c8c4be;
+            border-radius: 8px;
+            padding: 9px 16px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        QPushButton#secondaryButton:hover {
+            background: #ffffff;
+            border-color: #787671;
+        }
+        QPushButton#secondaryButton:pressed {
+            background: #f0eeec;
+        }
+
+        /* Tombol batal: merah lembut */
+        QPushButton#cancelButton {
+            background: #ffffff;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        QPushButton#cancelButton:hover {
+            background: #fef2f2;
+            border-color: #ef4444;
+        }
+        QPushButton#cancelButton:pressed {
+            background: #fee2e2;
+        }
+        QPushButton#cancelButton:disabled {
+            background: #f5f5f5;
+            color: #a3a3a3;
+            border-color: #e5e5e5;
+        }
+
+        /* Pilihan format output */
+        QComboBox {
+            background: rgba(255, 255, 255, 0.90);
+            color: #1a1a1a;
+            border: 1px solid #c8c4be;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+        }
+        QComboBox:hover { border-color: #5645d4; }
+        QComboBox QAbstractItemView {
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid #e5e3df;
+            selection-background-color: #e6e0f5;
+            selection-color: #391c57;
+            outline: none;
+        }
+
+        /* Progress bar tipis berwarna ungu */
+        QProgressBar {
+            background: rgba(255, 255, 255, 0.60);
+            border: none;
+            border-radius: 4px;
+        }
+        QProgressBar::chunk {
+            background: #5645d4;
+            border-radius: 4px;
+        }
+    )QSS");
+
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
     auto *title = new QLabel("Audio Converter");
-    title->setStyleSheet("font-size: 24px; font-weight: 700;");
+    title->setStyleSheet("font-size: 26px; font-weight: 700;");
 
     auto *description = new QLabel(
         "Convert audio atau ekstrak audio dari video."
@@ -85,11 +190,12 @@ void AudioPage::setupUI()
 
     // Toolbar
     auto *toolbar = new QHBoxLayout;
-    toolbar->setSpacing(10);
+    toolbar->setSpacing(8);
 
     auto *addButton = new QPushButton("+ Tambahkan Media");
     addButton->setObjectName("primaryButton");
     addButton->setCursor(Qt::PointingHandCursor);
+    addButton->setMinimumHeight(38);
 
     connect(
         addButton,
@@ -99,7 +205,9 @@ void AudioPage::setupUI()
     );
 
     auto *removeButton = new QPushButton("Hapus");
+    removeButton->setObjectName("secondaryButton");
     removeButton->setCursor(Qt::PointingHandCursor);
+    removeButton->setMinimumHeight(38);
 
     connect(
         removeButton,
@@ -109,7 +217,9 @@ void AudioPage::setupUI()
     );
 
     auto *clearButton = new QPushButton("Bersihkan");
+    clearButton->setObjectName("secondaryButton");
     clearButton->setCursor(Qt::PointingHandCursor);
+    clearButton->setMinimumHeight(38);
 
     connect(
         clearButton,
@@ -128,6 +238,7 @@ void AudioPage::setupUI()
 
     formatCombo_ = new QComboBox;
     formatCombo_->setMinimumWidth(130);
+    formatCombo_->setMinimumHeight(38);
     formatCombo_->addItems(FormatRegistry::audioOutputFormats());
     formatCombo_->setCursor(Qt::PointingHandCursor);
 
@@ -137,11 +248,75 @@ void AudioPage::setupUI()
     layout->addLayout(toolbar);
     layout->addSpacing(14);
 
-    // File list (gaya diatur oleh ThemeManager)
+    // File list
     fileList_ = new DropListWidget(this);
     fileList_->setFilterMode(DropListWidget::FilterMode::Audio);
     fileList_->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    fileList_->setMinimumHeight(240);
+    fileList_->setMinimumHeight(260);
+    fileList_->setViewMode(QListView::ListMode);
+    fileList_->setFlow(QListView::TopToBottom);
+    fileList_->setWrapping(false);
+    fileList_->setIconSize(QSize(kIconSize, kIconSize));
+    fileList_->setSpacing(4);
+    fileList_->setUniformItemSizes(false);
+    fileList_->setVerticalScrollMode(
+        QAbstractItemView::ScrollPerPixel
+    );
+
+    // Awal kosong = transparan (hanya bingkai putus-putus ala drop zone).
+    // Saat file masuk, tiap file tampil sebagai kartu.
+    fileList_->viewport()->setAutoFillBackground(false);
+    fileList_->setStyleSheet(R"QSS(
+            QListWidget {
+                background: transparent;
+                border: 2px dashed rgba(120, 118, 113, 0.55);
+                border-radius: 16px;
+                padding: 8px;
+                outline: none;
+                font-family: "Inter", "Segoe UI", sans-serif;
+                font-size: 14px;
+                font-weight: 500;
+            }
+            QListWidget::item {
+                background: rgba(255, 255, 255, 0.90);
+                color: #1a1a1a;
+                border: 1px solid #e5e3df;
+                border-radius: 12px;
+                padding: 8px 12px;
+                margin: 2px 2px;
+            }
+            QListWidget::item:hover {
+                background: #ffffff;
+                border: 1px solid #c8c4be;
+            }
+            QListWidget::item:selected {
+                background: #e6e0f5;
+                color: #391c57;
+                border: 2px solid #5645d4;
+            }
+
+            QScrollBar:vertical {
+                background: transparent;
+                width: 10px;
+                margin: 4px 2px;
+            }
+            QScrollBar::handle:vertical {
+                background: rgba(120, 118, 113, 0.55);
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: rgba(86, 69, 212, 0.85);
+            }
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {
+                background: transparent;
+            }
+        )QSS");
 
     connect(
         fileList_,
@@ -153,7 +328,7 @@ void AudioPage::setupUI()
     layout->addWidget(fileList_, 1);
     layout->addSpacing(14);
 
-    // Progress (gaya diatur oleh ThemeManager)
+    // Progress
     progressLabel_ = new QLabel("Menunggu konversi.");
     progressLabel_->setObjectName("descriptionLabel");
     progressLabel_->setStyleSheet("font-size: 12px;");
@@ -165,17 +340,23 @@ void AudioPage::setupUI()
     progressBar_->setFixedHeight(8);
 
     layout->addWidget(progressLabel_);
+    layout->addSpacing(4);
     layout->addWidget(progressBar_);
     layout->addSpacing(12);
 
     // Bottom action
     auto *bottomLayout = new QHBoxLayout;
+    bottomLayout->setSpacing(8);
 
     statusLabel_ = new QLabel("Belum ada media dipilih.");
     statusLabel_->setObjectName("descriptionLabel");
     statusLabel_->setStyleSheet("font-size: 13px;");
 
     cancelButton_ = new QPushButton("Batalkan");
+    cancelButton_->setObjectName("cancelButton");
+    cancelButton_->setCursor(Qt::PointingHandCursor);
+    cancelButton_->setMinimumHeight(38);
+    cancelButton_->setMinimumWidth(105);
     cancelButton_->setEnabled(false);
 
     connect(
@@ -188,6 +369,8 @@ void AudioPage::setupUI()
     convertButton_ = new QPushButton("Convert");
     convertButton_->setObjectName("primaryButton");
     convertButton_->setCursor(Qt::PointingHandCursor);
+    convertButton_->setMinimumHeight(38);
+    convertButton_->setMinimumWidth(105);
     convertButton_->setEnabled(false);
 
     connect(
@@ -242,6 +425,12 @@ void AudioPage::addFiles(const QStringList &filePaths)
 
             item->setData(Qt::UserRole, path);
             item->setToolTip(path);
+
+            // Ikon persegi (tampilan saja, tanpa membaca isi file)
+            item->setIcon(style()->standardIcon(
+                QStyle::SP_MediaVolume
+            ));
+            item->setSizeHint(QSize(0, kRowHeight));
 
             added = true;
         }

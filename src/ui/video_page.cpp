@@ -1,5 +1,6 @@
 #include "video_page.h"
 #include "drop_list.h"
+#include "../app_context.h"
 
 #include "../services/format_registry.h"
 #include "../services/video_converter_service.h"
@@ -16,6 +17,17 @@
 #include <QProgressBar>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#include <QIcon>
+#include <QSize>
+#include <QStyle>
+
+#include <QLineEdit>
+#include <QStandardPaths>
+
+// Ukuran ikon video (persegi 1:1) dan tinggi baris di daftar
+static constexpr int kIconSize = 72;
+static constexpr int kRowHeight = 96;
 
 VideoPage::VideoPage(QWidget *parent)
     : QWidget(parent)
@@ -63,16 +75,90 @@ QString VideoPage::selectedOutputFormat() const
     return formatCombo_ ? formatCombo_->currentText() : QString();
 }
 
-// ... existing code ...
 void VideoPage::setupUI()
 {
+    // ===== STYLE HALAMAN (gaya Notion) =====
+    // Dipasang di halaman ini saja supaya QSS tema tidak terganggu.
+    setStyleSheet(R"QSS(
+        /* Tombol utama: ungu */
+        QPushButton#primaryButton {
+            background: #5645d4;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 18px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        QPushButton#primaryButton:hover   { background: #4534b3; }
+        QPushButton#primaryButton:pressed { background: #3a2a99; }
+        QPushButton#primaryButton:disabled {
+            background: rgba(255, 255, 255, 0.55);
+            color: #a4a097;
+            border: 1px solid #e5e3df;
+        }
+
+        /* Tombol sekunder: Hapus, Bersihkan */
+        QPushButton#secondaryButton {
+            background: rgba(255, 255, 255, 0.88);
+            color: #1a1a1a;
+            border: 1px solid #c8c4be;
+            border-radius: 8px;
+            padding: 9px 16px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        QPushButton#secondaryButton:hover {
+            background: #ffffff;
+            border-color: #787671;
+        }
+        QPushButton#secondaryButton:pressed {
+            background: #f0eeec;
+        }
+
+        /* Pilihan format output */
+        QComboBox {
+            background: rgba(255, 255, 255, 0.90);
+            color: #1a1a1a;
+            border: 1px solid #c8c4be;
+            border-radius: 8px;
+            padding: 7px 12px;
+            font-family: "Inter", "Segoe UI", sans-serif;
+            font-size: 14px;
+        }
+        QComboBox:hover { border-color: #5645d4; }
+        QComboBox QAbstractItemView {
+            background: #ffffff;
+            color: #1a1a1a;
+            border: 1px solid #e5e3df;
+            selection-background-color: #e6e0f5;
+            selection-color: #391c57;
+            outline: none;
+        }
+
+        /* Progress bar tipis berwarna ungu */
+        QProgressBar {
+            background: rgba(255, 255, 255, 0.60);
+            border: none;
+            border-radius: 5px;
+            min-height: 10px;
+            max-height: 10px;
+        }
+        QProgressBar::chunk {
+            background: #5645d4;
+            border-radius: 5px;
+        }
+    )QSS");
+
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(12);
 
     auto *title = new QLabel("Video Converter");
     title->setStyleSheet(
-        "font-size:24px;font-weight:700;"
+        "font-size:26px;font-weight:700;"
     );
 
     auto *description = new QLabel(
@@ -89,10 +175,12 @@ void VideoPage::setupUI()
 
     // Toolbar
     auto *toolbar = new QHBoxLayout;
+    toolbar->setSpacing(8);
 
     auto *addButton = new QPushButton("+ Tambahkan Video");
     addButton->setObjectName("primaryButton");
     addButton->setCursor(Qt::PointingHandCursor);
+    addButton->setMinimumHeight(38);
 
     connect(
         addButton,
@@ -102,7 +190,9 @@ void VideoPage::setupUI()
     );
 
     auto *removeButton = new QPushButton("Hapus");
+    removeButton->setObjectName("secondaryButton");
     removeButton->setCursor(Qt::PointingHandCursor);
+    removeButton->setMinimumHeight(38);
 
     connect(
         removeButton,
@@ -112,7 +202,9 @@ void VideoPage::setupUI()
     );
 
     auto *clearButton = new QPushButton("Bersihkan");
+    clearButton->setObjectName("secondaryButton");
     clearButton->setCursor(Qt::PointingHandCursor);
+    clearButton->setMinimumHeight(38);
 
     connect(
         clearButton,
@@ -131,6 +223,7 @@ void VideoPage::setupUI()
 
     formatCombo_ = new QComboBox;
     formatCombo_->setMinimumWidth(130);
+    formatCombo_->setMinimumHeight(38);
     formatCombo_->addItems(FormatRegistry::videoOutputFormats());
     formatCombo_->setCursor(Qt::PointingHandCursor);
 
@@ -138,29 +231,141 @@ void VideoPage::setupUI()
     toolbar->addWidget(formatCombo_);
 
     layout->addLayout(toolbar);
+    // Output folder selector
+auto *outputLayout = new QHBoxLayout;
+outputLayout->setSpacing(8);
+
+auto *outputLabel = new QLabel("Simpan ke:");
+outputLabel->setStyleSheet("font-size:13px;font-weight:600;");
+
+outputPathEdit_ = new QLineEdit(this);
+outputPathEdit_->setPlaceholderText(
+    "Pilih folder penyimpanan video..."
+);
+outputPathEdit_->setMinimumHeight(38);
+outputPathEdit_->setClearButtonEnabled(true);
+outputPathEdit_->setStyleSheet(R"(
+    QLineEdit {
+        background: rgba(255,255,255,0.90);
+        color: #1a1a1a;
+        border: 1px solid #c8c4be;
+        border-radius: 8px;
+        padding: 7px 12px;
+        font-size: 13px;
+    }
+    QLineEdit:focus {
+        border: 1px solid #5645d4;
+    }
+)");
+
+browseOutputButton_ = new QPushButton("Browse");
+browseOutputButton_->setObjectName("secondaryButton");
+browseOutputButton_->setMinimumHeight(38);
+browseOutputButton_->setCursor(Qt::PointingHandCursor);
+
+outputLayout->addWidget(outputLabel);
+outputLayout->addWidget(outputPathEdit_, 1);
+outputLayout->addWidget(browseOutputButton_);
+
+layout->addLayout(outputLayout);
+
+// Load saved video folder
+QString savedFolder =
+    AppContext::instance().settings().getVideoOutputFolder();
+
+if (savedFolder.isEmpty() || !QDir(savedFolder).exists()) {
+    savedFolder = QStandardPaths::writableLocation(
+        QStandardPaths::MoviesLocation
+    );
+}
+
+if (savedFolder.isEmpty() || !QDir(savedFolder).exists()) {
+    savedFolder = QDir::homePath();
+}
+
+outputPathEdit_->setText(
+    QDir::toNativeSeparators(savedFolder)
+);
+
+connect(
+    browseOutputButton_,
+    &QPushButton::clicked,
+    this,
+    &VideoPage::browseOutputFolder
+);
+
+connect(
+    outputPathEdit_,
+    &QLineEdit::editingFinished,
+    this,
+    &VideoPage::saveOutputFolder
+);
 
     // File list
     fileList_ = new DropListWidget(this);
     fileList_->setFilterMode(DropListWidget::FilterMode::Video);
     fileList_->setSelectionMode(QAbstractItemView::ExtendedSelection);
-    fileList_->setMinimumHeight(220);
+    fileList_->setMinimumHeight(260);
+    fileList_->setIconSize(QSize(kIconSize, kIconSize));
+    fileList_->setSpacing(4);
+    fileList_->setVerticalScrollMode(
+        QAbstractItemView::ScrollPerPixel
+    );
 
-    fileList_->setStyleSheet(R"(
+    // Awal kosong = transparan (hanya bingkai putus-putus ala drop zone).
+    // Saat video masuk, tiap file tampil sebagai kartu.
+    fileList_->viewport()->setAutoFillBackground(false);
+    fileList_->setStyleSheet(R"QSS(
             QListWidget {
-                border: 1px solid rgba(255, 255, 255, 0.15);
-                border-radius: 8px;
-                padding: 6px;
+                background: transparent;
+                border: 2px dashed rgba(120, 118, 113, 0.55);
+                border-radius: 16px;
+                padding: 8px;
                 outline: none;
+                font-family: "Inter", "Segoe UI", sans-serif;
+                font-size: 14px;
+                font-weight: 500;
             }
             QListWidget::item {
-                padding: 8px 10px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                background: rgba(255, 255, 255, 0.90);
+                color: #1a1a1a;
+                border: 1px solid #e5e3df;
+                border-radius: 12px;
+                padding: 8px 12px;
+                margin: 2px 2px;
+            }
+            QListWidget::item:hover {
+                background: #ffffff;
+                border: 1px solid #c8c4be;
             }
             QListWidget::item:selected {
-                background: rgba(255, 255, 255, 0.15);
-                color: #ffffff;
+                background: #e6e0f5;
+                color: #391c57;
+                border: 2px solid #5645d4;
             }
-        )");
+
+            QScrollBar:vertical {
+                background: transparent;
+                width: 10px;
+                margin: 4px 2px;
+            }
+            QScrollBar::handle:vertical {
+                background: rgba(120, 118, 113, 0.55);
+                border-radius: 4px;
+                min-height: 30px;
+            }
+            QScrollBar::handle:vertical:hover {
+                background: rgba(86, 69, 212, 0.85);
+            }
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {
+                height: 0px;
+            }
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {
+                background: transparent;
+            }
+        )QSS");
 
     connect(
         fileList_,
@@ -190,6 +395,7 @@ void VideoPage::setupUI()
 
     // Bottom section
     auto *bottomLayout = new QHBoxLayout;
+    bottomLayout->setSpacing(8);
 
     statusLabel_ = new QLabel("Belum ada video dipilih.");
     statusLabel_->setStyleSheet(
@@ -206,7 +412,7 @@ void VideoPage::setupUI()
             background-color: #ffffff;
             color: #dc2626;
             border: 1px solid #fecaca;
-            border-radius: 7px;
+            border-radius: 8px;
             padding: 8px 16px;
             font-size: 13px;
             font-weight: 600;
@@ -239,6 +445,8 @@ void VideoPage::setupUI()
     convertButton_ = new QPushButton("Convert");
     convertButton_->setObjectName("primaryButton");
     convertButton_->setCursor(Qt::PointingHandCursor);
+    convertButton_->setMinimumHeight(38);
+    convertButton_->setMinimumWidth(105);
     convertButton_->setEnabled(false);
 
     connect(
@@ -298,6 +506,12 @@ void VideoPage::addFiles(const QStringList &filePaths)
 
             item->setData(Qt::UserRole, path);
             item->setToolTip(path);
+
+            // Ikon video persegi (tampilan saja, tanpa membaca isi video)
+            item->setIcon(style()->standardIcon(
+                QStyle::SP_MediaPlay
+            ));
+            item->setSizeHint(QSize(0, kRowHeight));
 
             added = true;
         }
@@ -395,15 +609,36 @@ void VideoPage::startBatchConversion()
         return;
     }
 
-    outputDirectory_ = QFileDialog::getExistingDirectory(
-        this,
-        "Pilih Folder Penyimpanan Video",
-        QDir::homePath()
+    const QString folder = QDir::cleanPath(
+        QDir::fromNativeSeparators(
+            outputPathEdit_->text().trimmed()
+        )
     );
 
-    if (outputDirectory_.isEmpty()) {
+    QFileInfo folderInfo(folder);
+
+    if (folder.isEmpty() ||
+        !folderInfo.exists() ||
+        !folderInfo.isDir() ||
+        !folderInfo.isWritable()) {
+
+        QMessageBox::warning(
+            this,
+            "Folder Output Tidak Valid",
+            "Folder penyimpanan tidak ditemukan atau tidak bisa ditulis.\n"
+            "Silakan pilih folder yang valid."
+        );
+
         return;
     }
+
+    outputDirectory_ = folder;
+
+    outputPathEdit_->setText(
+        QDir::toNativeSeparators(folder)
+    );
+
+    AppContext::instance().settings().setVideoOutputFolder(folder);
 
     pendingFiles_ = files_;
     errors_.clear();
@@ -414,6 +649,8 @@ void VideoPage::startBatchConversion()
 
     fileList_->setEnabled(false);
     formatCombo_->setEnabled(false);
+    outputPathEdit_->setEnabled(false);
+    browseOutputButton_->setEnabled(false);
 
     convertButton_->setEnabled(false);
     cancelButton_->show();
@@ -426,7 +663,6 @@ void VideoPage::startBatchConversion()
 
     processNextFile();
 }
-
 void VideoPage::processNextFile()
 {
     if (batchCancelled_) {
@@ -510,6 +746,8 @@ void VideoPage::finishBatch()
 {
     fileList_->setEnabled(true);
     formatCombo_->setEnabled(true);
+    outputPathEdit_->setEnabled(true);
+    browseOutputButton_->setEnabled(true);
 
     cancelButton_->hide();
     progressBar_->hide();
@@ -564,4 +802,69 @@ void VideoPage::finishBatch()
 
     pendingFiles_.clear();
     errors_.clear();
+}
+
+void VideoPage::browseOutputFolder()
+{
+    const QString currentFolder =
+        outputPathEdit_->text().trimmed();
+
+    const QString folder = QFileDialog::getExistingDirectory(
+        this,
+        "Pilih Folder Penyimpanan Video",
+        QDir(currentFolder).exists()
+            ? currentFolder
+            : QDir::homePath()
+    );
+
+    if (folder.isEmpty()) {
+        return;
+    }
+
+    outputPathEdit_->setText(
+        QDir::toNativeSeparators(folder)
+    );
+
+    saveOutputFolder();
+}
+
+
+void VideoPage::saveOutputFolder()
+{
+    const QString folder = QDir::cleanPath(
+        QDir::fromNativeSeparators(
+            outputPathEdit_->text().trimmed()
+        )
+    );
+
+    QFileInfo info(folder);
+
+    if (folder.isEmpty() ||
+        !info.exists() ||
+        !info.isDir() ||
+        !info.isWritable()) {
+
+        QMessageBox::warning(
+            this,
+            "Folder Tidak Valid",
+            "Folder tidak ditemukan atau tidak memiliki izin tulis."
+        );
+
+        const QString saved =
+            AppContext::instance().settings().getVideoOutputFolder();
+
+        if (!saved.isEmpty() && QDir(saved).exists()) {
+            outputPathEdit_->setText(
+                QDir::toNativeSeparators(saved)
+            );
+        }
+
+        return;
+    }
+
+    outputPathEdit_->setText(
+        QDir::toNativeSeparators(folder)
+    );
+
+    AppContext::instance().settings().setVideoOutputFolder(folder);
 }

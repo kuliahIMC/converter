@@ -25,6 +25,12 @@ public:
     QString getOutputFolder() const;
     void setOutputFolder(const QString &folder);
 
+    QString getImageOutputFolder() const;
+    void setImageOutputFolder(const QString &folder);
+    
+    QString getVideoOutputFolder() const;
+    void setVideoOutputFolder(const QString &folder);
+
     bool getRememberLastFolder() const;
     void setRememberLastFolder(bool remember);
 
