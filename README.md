@@ -48,6 +48,32 @@ Teknologi yang digunakan:
 
 ---
 
+
+## 🖥️ Tampilan Aplikasi
+
+Marhaban Converter menyediakan beberapa pilihan tema yang dapat disesuaikan dengan preferensi pengguna.
+
+### Light Theme
+![Marhaban Converter Light Theme](assets/ss/Screenshot-light.png)
+
+### Dark Theme
+![Marhaban Converter Dark Theme](assets/ss/Screenshot-dark.png)
+
+### Bochi Theme
+![Marhaban Converter Bochi Theme](assets/ss/Screenshot-bochi.png)
+
+### Frieren Theme
+![Marhaban Converter Frieren Theme](assets/ss/Screenshot-friren.png)
+
+### Kurumi Theme
+![Marhaban Converter Kurumi Theme](assets/ss/Screenshot-kurumi.png)
+
+### Mao Mao Theme
+![Marhaban Converter Mao Mao Theme](assets/ss/Screenshot-mao-mao.png)
+
+### Ram & Rem Theme
+![Marhaban Converter Ram and Rem Theme](assets/ss/Screenshot-ram-rem.png)
+
 ## 🚀 Fitur Aplikasi
 
 ### 🖼️ Pengolah Gambar dan Foto
