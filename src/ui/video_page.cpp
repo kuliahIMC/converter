@@ -18,6 +18,9 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+#include "dialogs/feedback_dialog.h"
+#include "../themes/theme_manager.h"
+
 #include <QIcon>
 #include <QSize>
 #include <QStyle>
@@ -29,8 +32,9 @@
 static constexpr int kIconSize = 72;
 static constexpr int kRowHeight = 96;
 
-VideoPage::VideoPage(QWidget *parent)
-    : QWidget(parent)
+VideoPage::VideoPage(ThemeManager *themeManager, QWidget *parent)
+    : QWidget(parent),
+      themeManager_(themeManager)
 {
     converter_ = new VideoConverterService(this);
 
@@ -646,6 +650,7 @@ void VideoPage::startBatchConversion()
     totalFiles_ = pendingFiles_.size();
     completedFiles_ = 0;
     batchCancelled_ = false;
+    batchFinished_ = false;
 
     fileList_->setEnabled(false);
     formatCombo_->setEnabled(false);
@@ -744,6 +749,12 @@ void VideoPage::cancelConversion()
 
 void VideoPage::finishBatch()
 {
+    if (batchFinished_) {
+        return;
+    }
+
+    batchFinished_ = true;
+
     fileList_->setEnabled(true);
     formatCombo_->setEnabled(true);
     outputPathEdit_->setEnabled(true);
@@ -755,50 +766,24 @@ void VideoPage::finishBatch()
 
     updateStatus();
 
-    if (batchCancelled_) {
-        QMessageBox::information(
-            this,
-            "Konversi Dibatalkan",
-            QString(
-                "Proses konversi dibatalkan.\n"
-                "%1 video selesai diproses."
-            ).arg(completedFiles_)
-        );
-
-        return;
-    }
+    const int failedCount = errors_.size();
 
     const int successCount =
-        totalFiles_ - errors_.size();
+        completedFiles_ - failedCount;
 
-    if (errors_.isEmpty()) {
-        QMessageBox::information(
-            this,
-            "Konversi Selesai",
-            QString(
-                "Berhasil mengonversi %1 video."
-            ).arg(successCount)
-        );
-    } else {
-        QString message =
-            QString(
-                "Berhasil: %1 video\n"
-                "Gagal: %2 video\n\n"
-                "Detail error:\n"
-            ).arg(successCount).arg(errors_.size());
+    const int skippedCount = batchCancelled_
+        ? qMax(0, totalFiles_ - completedFiles_)
+        : 0;
 
-        for (int i = 0; i < errors_.size(); ++i) {
-            message += QString("\n%1. %2")
-                .arg(i + 1)
-                .arg(errors_.at(i).left(300));
-        }
-
-        QMessageBox::warning(
-            this,
-            "Konversi Selesai dengan Error",
-            message
-        );
-    }
+    FeedbackDialog::showResult(
+        this,
+        themeManager_,
+        successCount,
+        failedCount,
+        skippedCount,
+        errors_,
+        batchCancelled_
+    );
 
     pendingFiles_.clear();
     errors_.clear();

@@ -10,13 +10,14 @@ class QProgressBar;
 class QLineEdit;
 class DropListWidget;
 class ImageConverterService;
+class ThemeManager;
 
 class PhotoPage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit PhotoPage(QWidget *parent = nullptr);
+    explicit PhotoPage(ThemeManager *themeManager, QWidget *parent = nullptr);
 
     QStringList files() const;
     QString selectedOutputFormat() const;
@@ -47,7 +48,8 @@ private:
     DropListWidget *fileList_ = nullptr;
     QComboBox *formatCombo_ = nullptr;
     QLineEdit *outputPathEdit_ = nullptr;
-
+    ThemeManager *themeManager_ = nullptr;
+    
     QLabel *statusLabel_ = nullptr;
 
     QPushButton *convertButton_ = nullptr;

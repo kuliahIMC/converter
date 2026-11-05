@@ -10,13 +10,14 @@ class QProgressBar;
 class DropListWidget;
 class VideoConverterService;
 class QLineEdit;
+class ThemeManager;
 
 class VideoPage : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit VideoPage(QWidget *parent = nullptr);
+    explicit VideoPage(ThemeManager *themeManager, QWidget *parent = nullptr);
 
     QStringList files() const;
     QString selectedOutputFormat() const;
@@ -48,10 +49,12 @@ private:
     QStringList pendingFiles_;
     QStringList errors_;
     QString outputDirectory_;
+    bool batchFinished_ = false;
 
     int totalFiles_ = 0;
     int completedFiles_ = 0;
     bool batchCancelled_ = false;
+    ThemeManager *themeManager_ = nullptr;
 
     DropListWidget *fileList_ = nullptr;
     QComboBox *formatCombo_ = nullptr;

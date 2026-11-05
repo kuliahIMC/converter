@@ -10,6 +10,7 @@ class QComboBox;
 class QSlider;
 class QProgressBar;
 class DropListWidget;
+class ThemeManager;
 
 class ImageCompressionService;
 class VideoCompressionService;
@@ -19,7 +20,7 @@ class CompressPage : public QWidget
     Q_OBJECT
 
 public:
-    explicit CompressPage(QWidget *parent = nullptr);
+    explicit CompressPage(ThemeManager *themeManager, QWidget *parent = nullptr);
 
     QStringList files() const;
     int quality() const;
@@ -57,6 +58,12 @@ private:
     bool isVideoFile(const QString &filePath) const;
 
     void finishCompression();
+
+    ThemeManager *themeManager_ = nullptr;
+
+    QStringList errors_;
+
+    bool batchFinished_ = false;
 
     QStringList files_;
     QStringList failedFiles_;

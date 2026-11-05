@@ -21,12 +21,17 @@
 #include <QSize>
 #include <QStyle>
 
+#include "dialogs/feedback_dialog.h"
+#include "../themes/theme_manager.h"
+
+
 // Ukuran ikon audio (persegi 1:1) dan tinggi baris di daftar
 static constexpr int kIconSize = 72;
 static constexpr int kRowHeight = 96;
 
-AudioPage::AudioPage(QWidget *parent)
-    : QWidget(parent)
+AudioPage::AudioPage(ThemeManager *themeManager, QWidget *parent)
+    : QWidget(parent),
+      themeManager_(themeManager)
 {
     converter_ = new AudioConverterService(this);
 
@@ -511,6 +516,7 @@ void AudioPage::startConversion()
     completedFiles_ = 0;
     totalFiles_ = pendingFiles_.size();
     batchCancelled_ = false;
+    batchFinished_ = false;
 
     progressBar_->setValue(0);
     progressLabel_->setText("Memulai konversi...");
@@ -637,6 +643,12 @@ void AudioPage::cancelConversion()
 
 void AudioPage::finishBatch()
 {
+    if (batchFinished_) {
+        return;
+    }
+
+    batchFinished_ = true;
+
     const bool wasCancelled = batchCancelled_;
 
     cancelButton_->setEnabled(false);
@@ -653,34 +665,29 @@ void AudioPage::finishBatch()
 
         progressLabel_->setText(
             QString("Selesai: %1 dari %2 file berhasil.")
-                .arg(totalFiles_ - errors_.size())
+                .arg(completedFiles_ - errors_.size())
                 .arg(totalFiles_)
         );
     }
 
-    if (wasCancelled) {
-        QMessageBox::information(
-            this,
-            "Konversi Dibatalkan",
-            "Proses konversi telah dibatalkan."
-        );
-    } else if (errors_.isEmpty()) {
-        QMessageBox::information(
-            this,
-            "Konversi Selesai",
-            QString("%1 file berhasil dikonversi.")
-                .arg(totalFiles_)
-        );
-    } else {
-        QMessageBox::warning(
-            this,
-            "Konversi Selesai dengan Kesalahan",
-            QString("%1 file berhasil.\n%2 file gagal.\n\nDetail kesalahan:\n%3")
-                .arg(totalFiles_ - errors_.size())
-                .arg(errors_.size())
-                .arg(errors_.join("\n\n"))
-        );
-    }
+    const int failedCount = errors_.size();
+
+    const int successCount =
+        completedFiles_ - failedCount;
+
+    const int skippedCount = wasCancelled
+        ? qMax(0, totalFiles_ - completedFiles_)
+        : 0;
+
+    FeedbackDialog::showResult(
+        this,
+        themeManager_,
+        successCount,
+        failedCount,
+        skippedCount,
+        errors_,
+        wasCancelled
+    );
 
     batchCancelled_ = false;
     updateStatus();

@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/assets">
+        <file alias="bochi-stk.png">assets/bochi-stk.png</file>
+        <file alias="mao-mao-stk.png">assets/mao-mao-stk.png</file>
+        <file alias="ram-rem-stk.png">assets/ram-rem-stk.png</file>
+        <file alias="light-stk.png">assets/light-stk.png</file>
+        <file alias="dark-stk.png">assets/dark-stk.png</file>
+        <file alias="friren-stk.png">assets/friren-stk.png</file>
+        <file alias="kurumi-stk.png">assets/kurumi-stk.png</file>
+    </qresource>
+</RCC>

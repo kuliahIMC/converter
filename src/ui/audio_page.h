@@ -9,12 +9,13 @@ class QComboBox;
 class QProgressBar;
 class DropListWidget;
 class AudioConverterService;
+class ThemeManager;
 
 class AudioPage : public QWidget {
     Q_OBJECT
 
 public:
-    explicit AudioPage(QWidget *parent = nullptr);
+    explicit AudioPage(ThemeManager *themeManager, QWidget *parent = nullptr);
 
     QStringList files() const;
     QString selectedOutputFormat() const;
@@ -43,6 +44,9 @@ private:
     QStringList pendingFiles_;
     QStringList errors_;
     QString outputDirectory_;
+
+    ThemeManager *themeManager_ = nullptr;
+    bool batchFinished_ = false;
 
     DropListWidget *fileList_ = nullptr;
     QComboBox *formatCombo_ = nullptr;

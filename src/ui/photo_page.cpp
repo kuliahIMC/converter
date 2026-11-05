@@ -25,13 +25,16 @@
 #include <QStyle>
 #include <QTimer>
 #include <QVBoxLayout>
+#include "dialogs/feedback_dialog.h"
+#include "../themes/theme_manager.h"
 
 // Ukuran thumbnail gambar
 static constexpr int kThumbSize = 112;
 static constexpr int kRowHeight = 132;
 
-PhotoPage::PhotoPage(QWidget *parent)
-    : QWidget(parent)
+PhotoPage::PhotoPage(ThemeManager *themeManager, QWidget *parent)
+    : QWidget(parent),
+      themeManager_(themeManager)
 {
     converter_ = new ImageConverterService(this);
 
@@ -853,32 +856,22 @@ void PhotoPage::finishBatchConversion()
 
     updateStatus();
 
+    const int failedCount = errors_.size();
+
     const int successCount =
-        completedFiles_ - errors_.size();
+        completedFiles_ - failedCount;
 
-    QString message;
+    const int skippedCount = batchCancelled_
+        ? qMax(0, totalFiles_ - completedFiles_)
+        : 0;
 
-    if (batchCancelled_) {
-        message = QString(
-            "Konversi dibatalkan.\n\nBerhasil: %1\nGagal: %2"
-        ).arg(successCount).arg(errors_.size());
-    } else {
-        message = QString(
-            "Konversi gambar selesai.\n\nBerhasil: %1\nGagal: %2"
-        ).arg(successCount).arg(errors_.size());
-    }
-
-    if (!errors_.isEmpty()) {
-        message += "\n\nDetail error:\n";
-
-        for (const QString &error : errors_) {
-            message += "\n• " + error;
-        }
-    }
-
-    QMessageBox::information(
+    FeedbackDialog::showResult(
         this,
-        "Photo Converter",
-        message
+        themeManager_,
+        successCount,
+        failedCount,
+        skippedCount,
+        errors_,
+        batchCancelled_
     );
 }

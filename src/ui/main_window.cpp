@@ -13,12 +13,18 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+
 #include "audio_page.h"
 #include "video_page.h"
 #include "photo_page.h"
 #include "compress_page.h"
 #include "calculator_page.h"
 #include "calendar_page.h"
+
+#include <QList>
+#include <QPixmap>
+#include <QSizePolicy>
+#include <QStringList>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -97,7 +103,7 @@ void MainWindow::setupUI()
 
     sidebarLayout->addStretch();
 
-    auto *version = new QLabel("Marhaban Converter · v2.1.0");
+    auto *version = new QLabel("Marhaban Converter · v2.2.0");
     version->setObjectName("versionLabel");
     sidebarLayout->addWidget(version);
 
@@ -469,22 +475,20 @@ void MainWindow::setupUI()
     toolButtons[0]->setChecked(true);
     toolDetails->setCurrentIndex(0);
 
+   
     // REGISTER PAGES
     pages_->addWidget(homePage);
-    pages_->addWidget(new PhotoPage);
-    pages_->addWidget(new VideoPage);
-    pages_->addWidget(new AudioPage);
-    pages_->addWidget(new CompressPage);
+
+    pages_->addWidget(new PhotoPage(themeManager_));
+    pages_->addWidget(new VideoPage(themeManager_));
+    pages_->addWidget(new AudioPage(themeManager_));
+    pages_->addWidget(new CompressPage(themeManager_));
+
     pages_->addWidget(new CalculatorPage);
     pages_->addWidget(new CalendarPage);
 
-
+    // Masukkan seluruh halaman ke area konten utama.
     contentLayout->addWidget(pages_, 1);
-
-    root->addWidget(sidebar);
-    root->addWidget(content, 1);
-
-    setCentralWidget(central);
 
     // sambungkan dulu, baru applyTheme, supaya foto langsung termuat
     connect(themeManager_, &ThemeManager::themeChanged,
@@ -493,19 +497,50 @@ void MainWindow::setupUI()
     // APPLY SAVED THEME
     themeManager_->applyTheme(themeManager_->currentTheme());
 
-    updateBackground();
-    navigateTo(0);
-}
+    // Masukkan sidebar dan konten ke layout utama.
+    root->addWidget(sidebar);
+    root->addWidget(content, 1);
+
+    // Tetapkan central widget pada QMainWindow.
+    setCentralWidget(central);
+
+
+    }
+
 
 void MainWindow::setupThemeSelector()
 {
     themeSelector_ = new QComboBox;
+
     themeSelector_->setObjectName("themeSelector");
-    themeSelector_->setMinimumWidth(145);
+    themeSelector_->setMinimumWidth(175);
+    themeSelector_->setMinimumHeight(40);
     themeSelector_->setCursor(Qt::PointingHandCursor);
 
-    themeSelector_->addItems(themeManager_->availableThemes());
-    themeSelector_->setCurrentText(themeManager_->currentTheme());
+    // Ukuran ikon karakter pada daftar tema
+    themeSelector_->setIconSize(QSize(48, 48));
+
+    // Atur tinggi popup agar thumbnail terlihat nyaman
+    themeSelector_->setMaxVisibleItems(7);
+
+    const QStringList themes = themeManager_->availableThemes();
+
+    for (const QString &theme : themes) {
+        const QString imagePath = themeManager_->themeImagePath(theme);
+
+        if (!imagePath.isEmpty()) {
+            QIcon themeIcon(imagePath);
+
+            themeSelector_->addItem(themeIcon, theme);
+        } else {
+            // Tetap tampilkan nama tema jika gambar tidak ditemukan
+            themeSelector_->addItem(theme);
+        }
+    }
+
+    themeSelector_->setCurrentText(
+        themeManager_->currentTheme()
+    );
 
     connect(
         themeSelector_,

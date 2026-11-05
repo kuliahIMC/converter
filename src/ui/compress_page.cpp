@@ -25,12 +25,17 @@
 #include <QSize>
 #include <QStyle>
 
+#include "dialogs/feedback_dialog.h"
+#include "../themes/theme_manager.h"
+#include <QtGlobal>
+
 // Ukuran thumbnail persegi (1:1) dan tinggi baris di daftar
 static constexpr int kThumbSize = 96;
 static constexpr int kRowHeight = 116;
 
-CompressPage::CompressPage(QWidget *parent)
+CompressPage::CompressPage(ThemeManager *themeManager, QWidget *parent)
     : QWidget(parent),
+      themeManager_(themeManager),
       imageService_(new ImageCompressionService(this)),
       videoService_(new VideoCompressionService(this))
 {
@@ -769,7 +774,9 @@ void CompressPage::startCompression()
     failedCount_ = 0;
 
     failedFiles_.clear();
+    errors_.clear();
 
+    batchFinished_ = false;
     cancelRequested_ = false;
     isProcessing_ = true;
 
@@ -809,6 +816,11 @@ void CompressPage::processNextFile()
     if (!QFileInfo::exists(inputPath)) {
         failedCount_++;
         failedFiles_.append(inputPath);
+        errors_.append(
+            QString("%1: File tidak ditemukan.")
+                .arg(QFileInfo(inputPath).fileName())
+        );
+
         currentIndex_++;
         processNextFile();
         return;
@@ -820,8 +832,13 @@ void CompressPage::processNextFile()
 
         failedCount_++;
         failedFiles_.append(inputPath);
-        currentIndex_++;
 
+        errors_.append(
+            QString("%1: Format file tidak sesuai kategori.")
+                .arg(QFileInfo(inputPath).fileName())
+        );
+
+        currentIndex_++;
         processNextFile();
         return;
     }
@@ -889,9 +906,18 @@ void CompressPage::handleCompressionFailed(
 {
     failedCount_++;
 
+    QString fileName;
+
     if (currentIndex_ < files_.size()) {
+        fileName = QFileInfo(files_.at(currentIndex_)).fileName();
         failedFiles_.append(files_.at(currentIndex_));
     }
+
+    errors_.append(
+        QString("%1: %2")
+            .arg(fileName)
+            .arg(errorMessage)
+    );
 
     statusLabel_->setText(
         "Gagal: " + errorMessage.left(120)
@@ -928,6 +954,11 @@ void CompressPage::handleCompressionCancelled()
 
 void CompressPage::finishCompression()
 {
+    if (batchFinished_) {
+        return;
+    }
+
+    batchFinished_ = true;
     isProcessing_ = false;
 
     fileList_->setEnabled(true);
@@ -940,37 +971,35 @@ void CompressPage::finishCompression()
 
     compressButton_->setEnabled(!files_.isEmpty());
 
+    const int skippedCount = cancelRequested_
+        ? qMax(0, files_.size() - currentIndex_)
+        : 0;
+
     progressBar_->setValue(
         cancelRequested_
-            ? (currentIndex_ * 100 / qMax(1, files_.size()))
+            ? currentIndex_ * 100 / qMax(1, files_.size())
             : 100
     );
 
-    QString summary = QString(
-        "Selesai: %1 berhasil, %2 gagal."
-    )
-        .arg(successCount_)
-        .arg(failedCount_);
+    statusLabel_->setText(
+        cancelRequested_
+            ? QString("Dibatalkan: %1 berhasil, %2 gagal, %3 dilewati.")
+                .arg(successCount_)
+                .arg(failedCount_)
+                .arg(skippedCount)
+            : QString("Selesai: %1 berhasil, %2 gagal.")
+                .arg(successCount_)
+                .arg(failedCount_)
+    );
 
-    if (cancelRequested_)
-        summary.prepend("Dibatalkan. ");
-
-    statusLabel_->setText(summary);
-
-    QString details = summary;
-
-    if (!failedFiles_.isEmpty()) {
-        details += "\n\nFile yang gagal:\n";
-
-        for (const QString &path : failedFiles_) {
-            details += "\n• " + QFileInfo(path).fileName();
-        }
-    }
-
-    QMessageBox::information(
+    FeedbackDialog::showResult(
         this,
-        "Kompresi Media",
-        details
+        themeManager_,
+        successCount_,
+        failedCount_,
+        skippedCount,
+        errors_,
+        cancelRequested_
     );
 
     updateStatus();

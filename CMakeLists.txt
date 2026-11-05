@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.21)
 
 project(MarhabanConverter
-    VERSION 1.0.0
+    VERSION 2.2.0
     DESCRIPTION "Marhaban Studio Desktop Media Converter"
     LANGUAGES CXX
 )
@@ -16,7 +16,11 @@ find_package(Qt6 6.12 REQUIRED COMPONENTS Widgets Svg)
 
 qt_standard_project_setup()
 
+set(CMAKE_AUTORCC ON)
+
 qt_add_executable(MarhabanConverter
+    app_icon.rc
+    resources.qrc
     src/main.cpp
 
     src/app_context.h
@@ -39,6 +43,9 @@ qt_add_executable(MarhabanConverter
     src/ui/calculator_page.cpp
     src/ui/calendar_page.h
     src/ui/calendar_page.cpp
+
+    src/ui/dialogs/feedback_dialog.h
+    src/ui/dialogs/feedback_dialog.cpp
 
     src/services/aae_service.h
     src/services/aae_service.cpp
@@ -78,15 +85,22 @@ qt_add_executable(MarhabanConverter
     src/workers/conversion_worker.cpp
 )
 
+set_target_properties(MarhabanConverter PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    WIN32_EXECUTABLE TRUE
+)
+
+target_compile_definitions(MarhabanConverter PRIVATE
+    APP_VERSION="${PROJECT_VERSION}"
+)
+
 target_link_libraries(MarhabanConverter
     PRIVATE
         Qt6::Widgets
         Qt6::Svg
 )
 
-set_target_properties(MarhabanConverter PROPERTIES
-    WIN32_EXECUTABLE TRUE
-)
+
 
 add_executable(CalendarTests
     tests/calendar_test.cpp

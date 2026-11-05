@@ -1,6 +1,6 @@
 
 #define MyAppName "Marhaban Converter"
-#define MyAppVersion "2.1.0"
+#define MyAppVersion "2.2.0"
 #define MyAppPublisher "Marhaban Studio"
 #define MyAppURL "https://marhabanstudio.my.id"
 #define MyAppExeName "MarhabanConverter.exe"
@@ -16,7 +16,7 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 AppCopyright=Copyright (C) 2026 {#MyAppPublisher}
 
-VersionInfoVersion=2.1.0.0
+VersionInfoVersion=2.2.0.0
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Installer
 VersionInfoProductName={#MyAppName}
@@ -38,6 +38,10 @@ CloseApplications=yes
 RestartApplications=no
 Uninstallable=yes
 
+; Upgrade dan perlindungan instalasi
+UsePreviousTasks=yes
+UsePreviousGroup=yes
+
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -47,7 +51,7 @@ UninstallDisplayName={#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
 
 [Languages]
-Name: "english"; MessagesFile: "compiler:Default.isl"
+Name: "indonesian"; MessagesFile: "Languages\Indonesia.isl"
 
 [Messages]
 WelcomeLabel1=Selamat datang di {#MyAppName}
@@ -59,7 +63,8 @@ FinishedLabel={#MyAppName} berhasil dipasang.%n%nKlik Selesai untuk menutup wiza
 Name: "desktopicon"; Description: "Buat shortcut di Desktop"; GroupDescription: "Shortcut tambahan:"; Flags: unchecked
 
 [Files]
-Source: "payload\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "payload\MarhabanConverter.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "payload\*"; DestDir: "{app}"; Excludes: "MarhabanConverter.exe"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"
